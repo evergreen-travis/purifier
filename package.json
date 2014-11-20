@@ -1,0 +1,33 @@
+{
+  "name": "project-beautifier",
+  "description": "Because less is more, beautify whatever project using CoffeeScript and YAML.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Kiko Beats",
+    "email": "josefrancisco.verdu@gmail.com",
+    "url": "https://github.com/Kikobeats"
+  },
+  "dependencies": {
+    "coffee-script": "*",
+    "js2coffee": "*",
+    "json2yaml": "*",
+    "meow": "*"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "wrench": "*"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "homepage": "",
+  "keywords": [],
+  "license": "MIT",
+  "main": "./index.js",
+  "repository": "kikobeats/project-beautifier",
+  "scripts": {
+    "test": "sh test/test.sh",
+    "prepublish": "npm prune"
+  }
+}
