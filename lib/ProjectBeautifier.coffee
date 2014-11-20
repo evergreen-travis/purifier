@@ -5,6 +5,7 @@ json2yaml        = require 'json2yaml'
 path             = require 'path'
 fs               = require 'fs'
 readdirRecursive = require 'recursive-readdir'
+
 ## -- Class ---------------------------------------------------------------
 
 class ProjectBeautifier
@@ -27,7 +28,6 @@ class ProjectBeautifier
       throw new Error err  if err
 
       converter = @["#{extOrig.substr(1)}2#{extDist.substr(1)}"]
-
       @_showVerboseMessage(route, extOrig, extDist) if @_VERBOSE
 
       _finally = =>
@@ -52,10 +52,7 @@ class ProjectBeautifier
   readFolder: (route, options, cb) ->
 
     readdirRecursive route, (err, files) =>
-
-      excludes = @_EXCLUDE.DIR.concat(@_EXCLUDE.FILE)
-
-      for exclude in excludes
+      for exclude in @_EXCLUDE.DIR.concat(@_EXCLUDE.FILE)
         re = new RegExp(exclude,"ig")
         for file, index in files
           files.splice(index, 1) if re.test(file)
