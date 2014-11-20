@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('shelljs/global');
 
 var cli = require('meow')({
   pkg: "../package.json",
@@ -18,3 +19,7 @@ var cli = require('meow')({
       '\t pb -i test/ -e yml',
   ].join('\n')
 });
+
+// console.log(find('.').filter(function(file) { return file.match(/\.js$/); }));
+console.log(find.filter);
+

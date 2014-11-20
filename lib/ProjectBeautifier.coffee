@@ -1,10 +1,10 @@
 ## -- Dependencies --------------------------------------------------------
 
-js2coffee = require 'js2coffee'
-json2yaml = require 'json2yaml'
-path      = require 'path'
-fs        = require 'fs'
-
+js2coffee        = require 'js2coffee'
+json2yaml        = require 'json2yaml'
+path             = require 'path'
+fs               = require 'fs'
+readdirRecursive = require 'recursive-readdir'
 ## -- Class ---------------------------------------------------------------
 
 class ProjectBeautifier
@@ -39,6 +39,28 @@ class ProjectBeautifier
 
       return @removeFile route, _finally if options.remove
       _finally()
+
+  convertFolder: (route, options, cb) ->
+    if arguments.length is 2
+      cb = options
+      options = {}
+
+    @readFolder route, options, (files) ->
+      # TODO: TO IMPLEMENT!
+      console.log files
+
+  readFolder: (route, options, cb) ->
+
+    readdirRecursive route, (err, files) =>
+
+      excludes = @_EXCLUDE.DIR.concat(@_EXCLUDE.FILE)
+
+      for exclude in excludes
+        re = new RegExp(exclude,"ig")
+        for file, index in files
+          files.splice(index, 1) if re.test(file)
+
+      if err then throw new Error err else cb files
 
   saveFile: (route, content, cb) ->
     fs.writeFile route, content, (err) ->

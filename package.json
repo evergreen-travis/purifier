@@ -11,7 +11,9 @@
     "coffee-script": "*",
     "js2coffee": "*",
     "json2yaml": "*",
-    "meow": "*"
+    "meow": "*",
+    "recursive-readdir": "^1.2.0",
+    "shelljs": "^0.3.0"
   },
   "devDependencies": {
     "mocha": "*",

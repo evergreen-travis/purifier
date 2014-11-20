@@ -40,6 +40,18 @@ describe 'Project Beautifier', ->
         fs.existsSync(route).should.eql false
         done()
 
+    it 'convert files from a folder', (done) ->
+      route = path.resolve __dirname, 'fixtures/test1'
+      pb.convertFolder route, {save:true, remove:true}, ->
+        fileOne = path.resolve __dirname, 'fixtures/test1', "hello-world_1.coffee"
+        fileTwo = path.resolve __dirname, 'fixtures/test1', "hello-world_2.coffee"
+        fileThree = path.resolve __dirname, 'fixtures/test1', "hello-world_3.coffee"
+
+        fs.existsSync(fileOne).should.eql true
+        fs.existsSync(fileTwo).should.eql true
+        fs.existsSync(fileThree).should.eql true
+        done()
+
   describe 'JSON into YAML', ->
 
     it 'convert just code', ->
