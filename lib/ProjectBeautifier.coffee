@@ -10,62 +10,31 @@ readdirRecursive = require 'recursive-readdir'
 
 class ProjectBeautifier
 
-  js2coffee: (content, options)->
-    content = JSON.stringify content if typeof content is 'object'
-    js2coffee.build(content, options)
-
-  json2yml: (content)-> json2yaml.stringify(JSON.parse(content))
-
-  convertFile: (route, options, cb) ->
-    if arguments.length is 2
-      cb = options
-      options = {}
+  convertFile: (route, options = {}, cb) ->
+    if arguments.length is 2 then cb = options; options = {}
 
     extOrig = path.extname route
     extDist = @_getConverter extOrig
 
     fs.readFile route, "utf8", (err, data) =>
-      throw new Error err  if err
-
-      converter = @["#{extOrig.substr(1)}2#{extDist.substr(1)}"]
+      throw err if err
+      converter = @["_#{extOrig.substr(1)}2#{extDist.substr(1)}"]
       @_showVerboseMessage(route, extOrig, extDist) if @_VERBOSE
+      newData = converter(data)
 
-      _finally = =>
+      _saveOrPrint = =>
         if options.save
           route = @_changeExtension(route, extOrig, extDist)
-          @saveFile route, converter(data), cb
+          fs.writeFile route, newData, (err) ->
+            throw err if err
+            cb(newData, route)
         else
-          cb(converter(data))
+          cb(newData)
 
-      return @removeFile route, _finally if options.remove
-      _finally()
-
-  convertFolder: (route, options, cb) ->
-    if arguments.length is 2
-      cb = options
-      options = {}
-
-    @readFolder route, options, (files) ->
-      # TODO: TO IMPLEMENT!
-      console.log files
-
-  readFolder: (route, options, cb) ->
-
-    readdirRecursive route, (err, files) =>
-      for exclude in @_EXCLUDE.DIR.concat(@_EXCLUDE.FILE)
-        re = new RegExp(exclude,"ig")
-        for file, index in files
-          files.splice(index, 1) if re.test(file)
-
-      if err then throw new Error err else cb files
-
-  saveFile: (route, content, cb) ->
-    fs.writeFile route, content, (err) ->
-      if err then throw new Error err else cb route
-
-  removeFile: (route, cb) ->
-    fs.unlink route, (err) ->
-      if err then throw new Error err else cb route
+      if options.remove
+        fs.unlink route, (err) -> if err then throw err else _saveOrPrint()
+      else
+        _saveOrPrint()
 
   ## -- Private -----------------------------------------------------------
 
@@ -78,7 +47,10 @@ class ProjectBeautifier
   _changeExtension: (route, origin, destination) ->
     routePath = route.split "."
     routePath[routePath.length-1] = destination.substr(1)
-    routePath.join(".")
+    routePath.join "."
+
+  _js2coffee: (content, options)-> js2coffee.build(content, options)
+  _json2yml: (content)-> json2yaml.stringify(JSON.parse(content))
 
   _getConverter: (ext) ->
     switch ext
