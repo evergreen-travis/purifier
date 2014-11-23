@@ -49,7 +49,7 @@ describe 'Project Beautifier', ->
         err.should.eql "[Error: File extension \'.coffee\' is not supported.]"
         done()
 
-    xit 'convert files from a folder', (done) ->
+    it 'convert files from a folder', (done) ->
       route = path.resolve __dirname, 'fixtures/test1'
       Purifier.convertFolder route, {save:true, remove:true}, ->
         fileOne = path.resolve __dirname, 'fixtures/test1/hello-world_1.coffee'

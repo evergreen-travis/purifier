@@ -21,11 +21,9 @@ class Purifier
     ], arguments)
 
     extOrig = path.extname args.route
-    try
-      extDist = @_getConverter extOrig
-      @_showVerboseMessage(args.route, extOrig, extDist) if @_VERBOSE
-    catch e
-      return args.cb(e)
+    return args.cb(e) unless @_isSupported(extOrig)
+    extDist = @_getConverter extOrig
+    @_showVerboseMessage(args.route, extOrig, extDist) if @_VERBOSE
 
     async.waterfall [
       (cb) ->
@@ -56,12 +54,11 @@ class Purifier
 
     async.waterfall [
       (cb) ->
-        readdirRecursive route, cb
-      (files, cb) ->
-        excludes = arrayUnion @_EXCLUDES, options.excludes or []
-        files = @_sanetizeRoutes(files, excludes)
-        ## TODO convertFile for file in files recursively
-        console.log files
+        readdirRecursive args.route, cb
+      (files, cb) =>
+        excludes = arrayUnion @_EXCLUDES, args.opts.excludes or []
+        @_sanetizeRoutes files, excludes, (routes) -> cb(null, routes)
+      (files, cb) =>
 
 
     ], (err, output, filePath) ->
@@ -72,35 +69,37 @@ class Purifier
 
   _VERBOSE: false
   _EXCLUDES: ['package.json', 'node_modules']
+  _CONVERTER:
+    '.js': '.coffee'
+    '.json': '.yml'
 
   _changeExtension: (route, origin, destination) ->
     routePath = route.split "."
     routePath[routePath.length-1] = destination.substr(1)
     routePath.join "."
 
-  _js2coffee: (content, options)-> js2coffee.build(content, options)
-  _json2yml: (content)-> json2yaml.stringify(JSON.parse(content))
+  _isSupported: (ext) -> @_CONVERTER[ext]?
 
   _getConverter: (ext) ->
-    switch ext
-      when '.js' then '.coffee'
-      when '.json' then '.yml'
-      else throw new Error "File extension '#{ext}' is not supported."
+    @_CONVERTER[ext] or throw new Error "File extension '#{ext}' is not supported."
+
+  _js2coffee: (content, options)-> js2coffee.build(content, options)
+  _json2yml: (content)-> json2yaml.stringify(JSON.parse(content))
 
   _showVerboseMessage: (route, extOrig, extDist) ->
     origFilePath = route.substr(process.cwd().length)
     distFilePath = @_changeExtension(origFilePath, extOrig, extDist)
     console.log "#{origFilePath} into #{distFilePath}"
 
-  _sanetizeRoutes: (routes, excludes) ->
-    routes.filter (route) ->
-      isNotAlready = true
-      for exclude in excludes
-        isInBlacklist = (new RegExp exclude, "ig").test route
-        if isInBlacklist
-          isNotAlready = false
-          break
-      isNotAlready
+  _isValidRoute: (route, excludes, cb) ->
+    async.detect excludes, (exclude, c) ->
+      c((new RegExp exclude, "ig").test route)
+    , (result) -> cb(not Boolean(result))
+
+  _sanetizeRoutes: (routes, excludes, cb) ->
+    async.filter routes, (route, c) =>
+      @_isValidRoute route, excludes, c
+    , cb
 
 ## -- Exports -------------------------------------------------------------
 
