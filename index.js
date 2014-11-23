@@ -2,9 +2,9 @@
  * Dependencies
  */
 require("coffee-script").register();
-var pb = require('./lib/ProjectBeautifier');
+var Purifier = require('./lib/Purifier');
 
 /**
  * Exports
  */
-exports = module.exports = new pb();
+exports = module.exports = new Purifier();
