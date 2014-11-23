@@ -43,25 +43,7 @@ describe 'Project Beautifier', ->
         fs.existsSync(filePath).should.eql false
         done()
 
-    xit 'try to convert a file that is not supported', (done) ->
-      filePath = path.resolve __dirname, 'fixtures/hello-world.coffee'
-      Purifier.convertFile filePath, {save:true, remove:true}, (err) ->
-        err.should.eql "[Error: File extension \'.coffee\' is not supported.]"
-        done()
-
-    it 'convert a folder', (done) ->
-      route = path.resolve __dirname, 'fixtures/test1'
-      Purifier.convertFolder route, {save:true, remove:true}, ->
-        fileOne = path.resolve __dirname, 'fixtures/test1/hello-world_1.coffee'
-        fileTwo = path.resolve __dirname, 'fixtures/test1/hello-world_2.coffee'
-        fileThree = path.resolve __dirname, 'fixtures/test1/hello-world_3.coffee'
-
-        fs.existsSync(fileOne).should.eql true
-        fs.existsSync(fileTwo).should.eql true
-        fs.existsSync(fileThree).should.eql true
-        done()
-
-  xdescribe 'JSON into YAML', ->
+  describe 'JSON into YAML', ->
 
     it 'convert just code', ->
       output = Purifier._json2yml """{"foo":"bar"}"""
@@ -77,4 +59,25 @@ describe 'Project Beautifier', ->
       filePath = path.resolve __dirname, 'fixtures/hello-world.json'
       Purifier.convertFile filePath, save:true, (output, route) ->
         fs.existsSync(route).should.eql true
+        done()
+
+  describe 'General', ->
+
+    it 'try to convert a file that is not supported', ->
+      (->
+        Purifier._getConverter('hbs')
+      ).should.throw("File extension 'hbs' is not supported.")
+
+    it 'convert a folder', (done) ->
+      route = path.resolve __dirname, 'fixtures/test1'
+      Purifier.convertFolder route, {save:true, remove:true}, ->
+        fileOne = path.resolve __dirname, 'fixtures/test1/hello-world_1.coffee'
+        fileTwo = path.resolve __dirname, 'fixtures/test1/hello-world_2.coffee'
+        fileThree = path.resolve __dirname, 'fixtures/test1/hello-world_3.coffee'
+        fileFour = path.resolve __dirname, 'fixtures/test1/hello-world.yml'
+
+        fs.existsSync(fileOne).should.eql true
+        fs.existsSync(fileTwo).should.eql true
+        fs.existsSync(fileThree).should.eql true
+        fs.existsSync(fileFour).should.eql true
         done()
