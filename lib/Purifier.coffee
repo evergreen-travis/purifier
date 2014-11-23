@@ -47,18 +47,26 @@ class Purifier
       throw err if err
       args.cb(output, filePath)
 
-  convertFolder: (route, options = {}, cb = undefined) ->
-    if arguments.length is 2 then cb = options; options = {}
-    readdirRecursive route, (err, files) =>
-      excludes = arrayUnion @_EXCLUDES, options.excludes or []
-      files = @_sanetizeRoutes(files, excludes)
+  convertFolder: ->
+    args = Args([
+      {route : Args.STRING   | Args.Required                     }
+      {opts  : Args.OBJECT   | Args.Optional, _default: {}       }
+      {cb    : Args.FUNCTION | Args.Optional, _default: undefined}
+    ], arguments)
 
-      ## TODO convertFile for file in files recursively
-      while files.length isnt 0
-        file = files.pop()
-        @convertFile file, options
+    async.waterfall [
+      (cb) ->
+        readdirRecursive route, cb
+      (files, cb) ->
+        excludes = arrayUnion @_EXCLUDES, options.excludes or []
+        files = @_sanetizeRoutes(files, excludes)
+        ## TODO convertFile for file in files recursively
+        console.log files
 
-      cb()
+
+    ], (err, output, filePath) ->
+      throw err if err
+      args.cb(output, filePath)
 
   ## -- Private -----------------------------------------------------------
 
