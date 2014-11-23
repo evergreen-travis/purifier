@@ -8,7 +8,9 @@
     "url": "https://github.com/Kikobeats"
   },
   "dependencies": {
+    "args-js": "*",
     "array-union": "*",
+    "async": "*",
     "coffee-script": "*",
     "js2coffee": "*",
     "json2yaml": "*",
