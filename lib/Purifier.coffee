@@ -21,7 +21,7 @@ class Purifier
     ], arguments)
 
     extOrig = path.extname args.route
-    return args.cb(e) unless @_isSupported(extOrig)
+    return args.cb?() unless @_isSupported(extOrig)
     extDist = @_getConverter extOrig
     @_showVerboseMessage(args.route, extOrig, extDist) if @_VERBOSE
 
@@ -58,9 +58,13 @@ class Purifier
       (files, cb) =>
         excludes = arrayUnion @_EXCLUDES, args.opts.excludes or []
         @_sanetizeRoutes files, excludes, (routes) -> cb(null, routes)
-      (files, cb) =>
+      (files, cb) ->
+        # TODO:
+        # for file in files
+        #   {Call @convertFile in parallel}
 
-
+        async.parallel exec, (err, results) ->
+          console.log results
     ], (err, output, filePath) ->
       throw err if err
       args.cb(output, filePath)

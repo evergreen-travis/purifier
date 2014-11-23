@@ -1,6 +1,6 @@
 {
-  "name": "project-beautifier",
-  "description": "Because less is more, beautify whatever project using CoffeeScript and YAML.",
+  "name": "purifier",
+  "description": "If you feel that your code is ugly, you need to purify it",
   "version": "0.1.0",
   "author": {
     "name": "Kiko Beats",
@@ -27,7 +27,7 @@
   "keywords": [],
   "license": "MIT",
   "main": "./index.js",
-  "repository": "kikobeats/project-beautifier",
+  "repository": "kikobeats/purifier",
   "scripts": {
     "test": "sh test/test.sh",
     "prepublish": "npm prune"
