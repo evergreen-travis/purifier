@@ -31,7 +31,6 @@
   "main": "./index.js",
   "repository": "kikobeats/purifier",
   "scripts": {
-    "test": "sh test/test.sh",
-    "prepublish": "npm prune"
+    "test": "sh test/test.sh"
   }
 }
