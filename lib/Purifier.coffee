@@ -59,17 +59,12 @@ class Purifier
         excludes = arrayUnion @_EXCLUDES, args.opts.excludes or []
         @_sanetizeRoutes files, excludes, (routes) -> cb(null, routes)
       (files, cb) =>
-        # TODO:
-        # for file in files
-        #   {Call @convertFile in parallel}
         async.each files, (file, c) =>
           @convertFile file, args.opts, c
-        , (err) ->
-          console.log err
-
-    ], (err, output, filePath) ->
+        , (output, filePath) -> cb(null)
+    ], (err) ->
       throw err if err
-      args.cb(output, filePath)
+      args.cb()
 
   ## -- Private -----------------------------------------------------------
 
