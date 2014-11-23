@@ -6,7 +6,7 @@ var cli = require('meow')({
   pkg: "../package.json",
   help: [
       'Usage',
-      '  $ pb [options]',
+      '  $ purifier [options]',
       '\n  options:',
       '\t -p\t     specify the path.',
       '\t -i\t     files to ignore in the conversion.',
@@ -14,12 +14,12 @@ var cli = require('meow')({
       '\t -n\t     don\'t remove original files.',
       '\t --version   output the current version.',
       '\n  examples:',
-      '\t pb -p $HOME/Projects/SecretUglyProject',
-      '\t pb -e coffee',
-      '\t pb -i test/ -e yml',
+      '\t purifier -p $HOME/Projects/SecretUglyProject',
+      '\t purifier -e coffee',
+      '\t purifier -i test/ -e yml',
   ].join('\n')
 });
 
+console.log(cli.showHelp());
 // console.log(find('.').filter(function(file) { return file.match(/\.js$/); }));
-console.log(find.filter);
 

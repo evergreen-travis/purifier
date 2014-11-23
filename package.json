@@ -1,11 +1,14 @@
 {
   "name": "purifier",
-  "description": "If you feel that your code is ugly, you need to purify it",
+  "description": "If you feel that your code is ugly, you need to purify it.",
   "version": "0.1.0",
   "author": {
     "name": "Kiko Beats",
     "email": "josefrancisco.verdu@gmail.com",
     "url": "https://github.com/Kikobeats"
+  },
+  "bin": {
+    "purifier": "bin/index.js"
   },
   "dependencies": {
     "args-js": "*",
