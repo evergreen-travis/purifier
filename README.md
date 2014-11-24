@@ -16,7 +16,7 @@
 * Convert from **js** to **coffee**.
 * Convert from **json** to **yaml**.
 
-Only run `purifier` command in the folder where you want to change the files. Also you can specify what languages want to transform, file to ignore, only print the output or save the file...
+Only run `purifier` command in the folder where you want to change the files. Also you can specify what languages want to transform, file to ignore, only print the output or save the file... You can use the command `--help` for more information.
 
 **Purifier** it's based in packages that convert the code and only is a high-level wrapper of this packages for convert the code easily.
 
