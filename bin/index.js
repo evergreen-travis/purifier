@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-require('shelljs/global');
-
+var Purifier = require('..');
 var cli = require('meow')({
   pkg: "../package.json",
   help: [
@@ -20,6 +19,16 @@ var cli = require('meow')({
   ].join('\n')
 });
 
-console.log(cli.showHelp());
-// console.log(find('.').filter(function(file) { return file.match(/\.js$/); }));
+var dir = cli.flags.p || process.cwd();
+var opts = {
+  remove: !cli.flags.n|| true,
+  ignore: cli.flags.i || null,
+  ext: cli.flags.e
+};
 
+console.log(cli.flags);
+console.log(dir);
+console.log(opts);
+
+// console.log();
+// console.log(Purifier.convertFile);
