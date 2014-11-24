@@ -2,8 +2,10 @@
 
 fs               = require 'fs'
 path             = require 'path'
-Args             = require 'args-js'
+chalk            = require 'chalk'
 async            = require 'async'
+figures          = require 'figures'
+Args             = require 'args-js'
 js2coffee        = require 'js2coffee'
 json2yaml        = require 'json2yaml'
 arrayUnion       = require 'array-union'
@@ -68,7 +70,7 @@ class Purifier
 
   ## -- Private -----------------------------------------------------------
 
-  _VERBOSE: false
+  _VERBOSE: true
   _EXCLUDES: ['package.json', 'node_modules']
   _CONVERTER:
     '.js': '.coffee'
@@ -89,8 +91,11 @@ class Purifier
 
   _showVerboseMessage: (route, extOrig, extDist) ->
     origFilePath = route.substr(process.cwd().length)
-    distFilePath = @_changeExtension(origFilePath, extOrig, extDist)
-    console.log "#{origFilePath} into #{distFilePath}"
+    dirname = path.dirname(origFilePath)
+
+    console.log """
+    #{dirname}#{chalk.dim(extOrig)} #{chalk.green(figures.arrowRight)} \
+    #{chalk.bold(extDist)} #{chalk.green("purified")}"""
 
   _isValidRoute: (route, excludes, cb) ->
     async.detect excludes, (exclude, c) ->

@@ -1,7 +1,7 @@
 {
   "name": "purifier",
   "description": "If you feel that your code is ugly, you need to purify it.",
-  "version": "0.1.0",
+  "version": "0.11.24",
   "author": {
     "name": "Kiko Beats",
     "email": "josefrancisco.verdu@gmail.com",
@@ -14,7 +14,9 @@
     "args-js": "*",
     "array-union": "*",
     "async": "*",
+    "chalk": "*",
     "coffee-script": "*",
+    "figures": "*",
     "js2coffee": "*",
     "json2yaml": "*",
     "meow": "*",
