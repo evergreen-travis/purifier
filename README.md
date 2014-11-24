@@ -9,7 +9,16 @@
 
 > If you feel that your code is ugly, you need to purify it.
 
-![](http://i.imgur.com/i2UW5xJ.png)
+![](http://i.imgur.com/hQASxFx.png)
+
+**Purifier** set the language that you want to use. At this moment **Purifier** can be:
+
+* Convert from **js** to **coffee**.
+* Convert from **json** to **yaml**.
+
+Only run `purifier` command in the folder where you want to change the files. Also you can specify what languages want to transform, file to ignore, only print the output or save the file...
+
+**Purifier** it's based in packages that convert the code and only is a high-level wrapper of this packages for convert the code easily.
 
 ## Install
 
@@ -20,5 +29,3 @@ npm install -g purifier
 ## License
 
 MIT © [Kiko Beats](http://www.kikobeats.com)
-
-
