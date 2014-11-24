@@ -81,6 +81,7 @@ class Purifier
         readdirRecursive args.route, cb
       (files, cb) =>
         ignore = arrayUnion @_DEFAULT_OPTS.IGNORE, args.opts.ignore or []
+        @_determinateExtensions(args.opts.ext)
         @_sanetizeRoutes files, ignore, (routes) -> cb(null, routes)
       (files, cb) =>
         async.each files, (file, c) =>
@@ -118,7 +119,7 @@ class Purifier
     origFilePath = route.substr(process.cwd().length)
     dirname = path.dirname(origFilePath)
     console.log """
-    #{dirname}#{chalk.dim(extOrig)} #{chalk.green(figures.arrowRight)} \
+    #{dirname}.#{chalk.dim(extOrig)} #{chalk.green(figures.arrowRight)} \
     #{chalk.bold(extDist)} #{chalk.green("purified")}"""
 
   _isValidRoute: (route, ignore, cb) ->
@@ -130,6 +131,14 @@ class Purifier
     async.filter routes, (route, c) =>
       @_isValidRoute route, ignore, c
     , cb
+
+  _determinateExtensions: (extensions) ->
+    return unless extensions?
+    newExtensions = {}
+    for extension in extensions
+      if @_DEFAULT_OPTS.EXT[extension]?
+        newExtensions[extension] = @_DEFAULT_OPTS.EXT[extension]
+    @_DEFAULT_OPTS.EXT = newExtensions
 
 ## -- Exports -------------------------------------------------------------
 
