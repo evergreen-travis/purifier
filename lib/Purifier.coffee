@@ -31,7 +31,7 @@ class Purifier
       {cb    : Args.FUNCTION | Args.Optional, _default: undefined}
     ], arguments)
 
-    extOrig = path.extname args.route
+    extOrig = (path.extname args.route).substr(1)
     return args.cb?() unless @_isSupported(extOrig)
     extDist = @_getConverter extOrig
     @_showVerboseMessage(args.route, extOrig, extDist) if @_VERBOSE
@@ -40,7 +40,7 @@ class Purifier
       (cb) ->
         fs.readFile args.route, "utf8", cb
       (data, cb) =>
-        converter = @["_#{extOrig.substr(1)}2#{extDist.substr(1)}"]
+        converter = @["_#{extOrig}2#{extDist}"]
         cb(null, converter(data))
       (data, cb) ->
         if args.opts.remove
@@ -97,12 +97,12 @@ class Purifier
   _DEFAULT_OPTS:
     IGNORE: ['package.json', 'node_modules']
     EXT:
-      '.js': '.coffee'
-      '.json': '.yml'
+      'js': 'coffee'
+      'json': 'yml'
 
   _changeExtension: (route, origin, destination) ->
     routePath = route.split "."
-    routePath[routePath.length-1] = destination.substr(1)
+    routePath[routePath.length-1] = destination
     routePath.join "."
 
   _isSupported: (ext) -> @_DEFAULT_OPTS.EXT[ext]?
