@@ -5,30 +5,28 @@ var cli = require('meow')({
   pkg: "../package.json",
   help: [
       'Usage',
-      '  $ purifier [options]',
+      '  $ purifier [path][options]',
       '\n  options:',
-      '\t -p\t     specify the path.',
       '\t -i\t     files to ignore in the conversion.',
       '\t -e\t     specify extension to convert.',
       '\t -n\t     don\'t remove original files.',
       '\t --version   output the current version.',
       '\n  examples:',
-      '\t purifier -p $HOME/Projects/SecretUglyProject',
+      '\t purifier $HOME/Projects/SecretUglyProject',
       '\t purifier -e coffee',
-      '\t purifier -i test/ -e yml',
+      '\t purifier -i bin -i client -e yml',
   ].join('\n')
 });
 
-var dir = cli.flags.p || process.cwd();
+var dir = cli.input[0] || process.cwd();
 var opts = {
   remove: !cli.flags.n|| true,
-  ignore: cli.flags.i || null,
+  save: true,
+  ignore: cli.flags.i,
   ext: cli.flags.e
 };
 
-console.log(cli.flags);
-console.log(dir);
-console.log(opts);
-
-// console.log();
-// console.log(Purifier.convertFile);
+console.log();
+Purifier.convertFolder(dir, opts, function(){
+  console.log("\nYour project has been purified.");
+});

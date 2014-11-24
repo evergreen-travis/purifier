@@ -93,10 +93,10 @@ class Purifier
 
   ## -- Private -----------------------------------------------------------
 
-  _VERBOSE: false
+  _VERBOSE: true
 
   _DEFAULT_OPTS:
-    IGNORE: ['package.json', 'node_modules']
+    IGNORE: ['package.json', 'bower.json', 'node_modules']
     EXT:
       'js': 'coffee'
       'json': 'yml'
@@ -116,11 +116,10 @@ class Purifier
   _json2yml: (content)-> json2yaml.stringify(JSON.parse(content))
 
   _showVerboseMessage: (route, extOrig, extDist) ->
-    origFilePath = route.substr(process.cwd().length)
-    dirname = path.dirname(origFilePath)
+    origFilePath = route.substr(process.cwd().length) or route
     console.log """
-    #{dirname}.#{chalk.dim(extOrig)} #{chalk.green(figures.arrowRight)} \
-    #{chalk.bold(extDist)} #{chalk.green("purified")}"""
+    #{origFilePath} #{chalk.green(figures.arrowRight)} \
+    #{chalk.bold(extDist)} #{chalk.green("purified")}."""
 
   _isValidRoute: (route, ignore, cb) ->
     async.detect ignore, (exclude, c) ->
