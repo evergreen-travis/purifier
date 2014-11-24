@@ -1,4 +1,4 @@
-# Purfier
+# Purifier
 
 [![Build Status](http://img.shields.io/travis/kikobeats/purifier/master.svg?style=flat)](https://travis-ci.org/kikobeats/purifier)
 [![Coverage Status](http://img.shields.io/coveralls/kikobeats/purifier/master.svg?style=flat)](https://coveralls.io/r/kikobeats/purifier?branch=master)
