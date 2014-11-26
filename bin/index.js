@@ -23,8 +23,15 @@ var opts = {
   remove: !cli.flags.n|| true,
   save: true,
   ignore: cli.flags.i,
-  ext: cli.flags.e
+  ext: determinateExtension()
 };
+
+function determinateExtension(){
+  if (typeof cli.flags.e === 'string')
+    return new Array(cli.flags.e);
+  else
+    return cli.flags.e;
+}
 
 console.log();
 Purifier.convertFolder(dir, opts, function(){
