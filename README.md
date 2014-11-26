@@ -1,6 +1,6 @@
 # Purifier
 
-[![Build Status](http://img.shields.io/travis/kikobeats/purifier/master.svg?style=flat)](https://travis-ci.org/Kikobeats/purifier)
+[![Build Status](http://img.shields.io/travis/Kikobeats/purifier/master.svg?style=flat)](https://travis-ci.org/Kikobeats/purifier)
 [![Dependency status](http://img.shields.io/david/kikobeats/purifier.svg?style=flat)](https://david-dm.org/kikobeats/purifier)
 [![Dev Dependencies Status](http://img.shields.io/david/dev/kikobeats/purifier.svg?style=flat)](https://david-dm.org/kikobeats/purifier#info=devDependencies)
 [![NPM Status](http://img.shields.io/npm/dm/purifier.svg?style=flat)](https://www.npmjs.org/package/purifier)
