@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 'use strict';
 var Purifier = require('..');
+var chalk = require('chalk');
 var cli = require('meow')({
-  pkg: "../package.json",
+  pkg: '../package.json',
   help: [
       'Usage',
-      '  $ purifier [path][options]',
+      '  $ purifier [rootPath][options]',
       '\n  options:',
       '\t -i\t     files to ignore in the conversion.',
       '\t -e\t     specify extension to convert.',
@@ -13,27 +14,32 @@ var cli = require('meow')({
       '\t --version   output the current version.',
       '\n  examples:',
       '\t purifier $HOME/Projects/SecretUglyProject',
-      '\t purifier -e coffee',
-      '\t purifier -i bin -i client -e yml',
+      '\t purifier $HOME/Projects/SecretUglyProject -e js -e json',
+      '\t purifier $HOME/Projects/SecretUglyProject -e js -e json -i bin',
   ].join('\n')
 });
 
-var dir = cli.input[0] || process.cwd();
+var rootPath = cli.input[0] || process.cwd();
 var opts = {
-  remove: !cli.flags.n|| true,
+  remove: cli.flags.n === undefined ? true : !cli.flags.n,
   save: true,
-  ignore: cli.flags.i,
-  ext: determinateExtension()
+  verbose: false,
+  ignore: cli.flags.i || [],
+  extensions: (function() {
+    if (typeof cli.flags.e === 'string') {
+      return new Array(cli.flags.e);
+    } else if (typeof cli.flags.e === 'object'){
+      return cli.flags.e;
+    } else {
+      return [];
+    }
+  })()
 };
 
-function determinateExtension(){
-  if (typeof cli.flags.e === 'string')
-    return new Array(cli.flags.e);
-  else
-    return cli.flags.e;
-}
-
-console.log();
-Purifier.convertFolder(dir, opts, function(){
-  console.log("\nYour project has been purified.");
+Purifier.transformFolder(rootPath, opts, function(counter){
+  if (counter) {
+    console.log('\n', chalk.bold(counter + ' files'), 'has been purified.');
+  } else {
+    console.log('\n', chalk.underline('Nothing'),'to purify.');
+  }
 });

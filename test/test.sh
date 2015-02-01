@@ -22,6 +22,7 @@ run() {
 
 ## Main
 welcome && run \
-test/test.coffee
-
-
+test/test.converter.coffee \
+test/test.blacklist.coffee \
+test/test.file.coffee \
+test/test.purifier.coffee

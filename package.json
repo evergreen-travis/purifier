@@ -1,7 +1,7 @@
 {
   "name": "purifier",
   "description": "If you feel that your code is ugly, you need to purify it.",
-  "version": "0.11.26",
+  "version": "1.0.0",
   "author": {
     "name": "Kiko Beats",
     "email": "josefrancisco.verdu@gmail.com",
@@ -32,7 +32,7 @@
     "node": "*"
   },
   "homepage": "",
-  "keywords": [],
+  "keywords": ["file", "converter", "cli", "command-line"],
   "license": "MIT",
   "main": "./index.js",
   "repository": "kikobeats/purifier",

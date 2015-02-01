@@ -1,144 +1,102 @@
-## -- Dependencies --------------------------------------------------------
+"use strict"
 
-fs               = require 'fs'
-path             = require 'path'
-chalk            = require 'chalk'
-async            = require 'async'
-figures          = require 'figures'
-Args             = require 'args-js'
-js2coffee        = require 'js2coffee'
-json2yaml        = require 'json2yaml'
-arrayUnion       = require 'array-union'
-readdirRecursive = require 'recursive-readdir'
+async     = require 'async'
+Args      = require 'args-js'
+Converter = require './Converter'
+File      = require './File'
+Logger    = require './Logger'
+Blacklist = require './Blacklist'
 
-## -- Class ---------------------------------------------------------------
-
-class Purifier
+module.exports = class Purifier
 
   ###*
    * Convert a file into other file with different extension.
-   * @param  {string} route path of the file.
+   * @param  {string} file path of the file.
    * @param  {object} opts  options of the conversion. can be:
    *  - remove: flag that indicate if the original file must be deleted.
    *  - save: flag to indicate if the new file must be saved.
+   *  - verbose: true by default. print the operation in the CLI.
    * @return {string} the data conversion.
    * @return {string} the new path of the file.
   ###
-  convertFile: (route, test)->
+  @transformFile: ->
+    _options = {counter: 0, verbose: true}
     args = Args([
-      {route : Args.STRING   | Args.Required                     }
-      {opts  : Args.OBJECT   | Args.Optional, _default: {}       }
-      {cb    : Args.FUNCTION | Args.Optional, _default: undefined}
+      {file : Args.STRING   | Args.Required                     }
+      {opts : Args.OBJECT   | Args.Optional, _default: _options }
+      {cb   : Args.FUNCTION | Args.Optional, _default: undefined}
     ], arguments)
 
-    extOrig = (path.extname args.route).substr(1)
-    return args.cb?() unless @_isSupported(extOrig)
-    extDist = @_getConverter extOrig
-    @_showVerboseMessage(args.route, extOrig, extDist) if @_VERBOSE
+    startExtension = File.getExtension args.file
+    return args.cb?() unless Converter.isSupported(startExtension)
+    ++args.opts.counter
+    endExtension = Converter.get startExtension
+
+    Logger.print(args.file, endExtension) if args.opts.verbose
 
     async.waterfall [
       (cb) ->
-        fs.readFile args.route, "utf8", cb
-      (data, cb) =>
-        converter = @["_#{extOrig}2#{extDist}"]
+        File.read args.file, cb
+      (data, cb) ->
+        converter = Converter["#{startExtension}2#{endExtension}"]
         cb(null, converter(data))
       (data, cb) ->
         if args.opts.remove
-          fs.unlink args.route, (err) -> cb(err, data)
+          File.remove args.file, (err) -> cb(err, data)
         else cb null, data
-      (data, cb) =>
+      (data, cb) ->
         if args.opts.save
-          writePath = @_changeExtension(args.route, extOrig, extDist)
-          fs.writeFile writePath, data, (err) -> cb(err, data, writePath)
+          file = File.changeExtension(args.file, endExtension)
+          File.write file, data, (err) ->
+           cb(err, data, args.opts.counter, file)
         else
-          cb null, data, route
-    ], (err, output, filePath) ->
+          cb null, data, args.opts.counter, file
+    ], (err, data, counter, file) ->
       throw err if err
-      args.cb(output, filePath)
+      args.cb(data, counter, file)
 
 
 
   ###*
    * Convert a folder of files
-   * @param  {string} route path of the file.
+   * @param  {string} file path of the file.
    * @param  {object} opts  options of the conversion. can be:
    *  - remove: flag that indicate if the original file must be deleted.
    *  - save: flag to indicate if the new file must be saved.
    *  - ignore: Indicate what files can be ignore.
    *  - ext: Indicate compatible extension in the conversion.
+   *  - verbose: true by default. print the operation in the CLI.
    * @return {string} the data conversion.
    * @return {string} the new path of the file.
   ###
-  convertFolder: ->
+  @transformFolder: ->
+    _options = {extensions: [], verbose: true}
     args = Args([
-      {route : Args.STRING   | Args.Required                     }
-      {opts  : Args.OBJECT   | Args.Optional, _default: {}       }
+      {file  : Args.STRING   | Args.Required                     }
+      {opts  : Args.OBJECT   | Args.Optional, _default: _options }
       {cb    : Args.FUNCTION | Args.Optional, _default: undefined}
     ], arguments)
 
+    Blacklist.add(args.opts.ignore) if args.opts.ignore?
+    args.opts.extensions = [] unless args.opts.extensions?
+    args.opts.counter = 0
+
     async.waterfall [
       (cb) ->
-        readdirRecursive args.route, cb
+        File.readRecursive args.file, cb
+      (files, cb) ->
+        return cb(null, files) if args.opts.extensions.length is 0
+        File.sanetizeFromExtension files, args.opts.extensions, (files) ->
+          cb(null, files)
+      (files, cb) ->
+        File.sanetizeFromBacklist files, (files) ->
+          cb(null, files)
       (files, cb) =>
-        ignore = arrayUnion @_DEFAULT_OPTS.IGNORE, args.opts.ignore or []
-        @_determinateExtensions(args.opts.ext)
-        @_sanetizeRoutes files, ignore, (routes) -> cb(null, routes)
-      (files, cb) =>
+        console.log files
         async.each files, (file, c) =>
-          @convertFile file, args.opts, c
-        , (output, filePath) -> cb(null)
-    ], (err) ->
+          @transformFile file, args.opts, c
+        , ->
+          cb(null, args.opts.counter, files)
+    ], (err, counter, files) ->
       throw err if err
-      args.cb()
-
-  ## -- Private -----------------------------------------------------------
-
-  _VERBOSE: true
-
-  _DEFAULT_OPTS:
-    IGNORE: ['package.json', 'bower.json', 'node_modules']
-    EXT:
-      'js': 'coffee'
-      'json': 'yml'
-
-  _changeExtension: (route, origin, destination) ->
-    routePath = route.split "."
-    routePath[routePath.length-1] = destination
-    routePath.join "."
-
-  _isSupported: (ext) -> @_DEFAULT_OPTS.EXT[ext]?
-
-  _getConverter: (ext) ->
-    @_DEFAULT_OPTS.EXT[ext] or
-    throw new Error "File extension '#{ext}' is not supported."
-
-  _js2coffee: (content, options)-> js2coffee.build(content, options)
-  _json2yml: (content)-> json2yaml.stringify(JSON.parse(content))
-
-  _showVerboseMessage: (route, extOrig, extDist) ->
-    origFilePath = route.substr(process.cwd().length) or route
-    console.log """
-    #{origFilePath} #{chalk.green(figures.arrowRight)} \
-    #{chalk.bold(extDist)} #{chalk.green("purified")}."""
-
-  _isValidRoute: (route, ignore, cb) ->
-    async.detect ignore, (exclude, c) ->
-      c((new RegExp exclude, "ig").test route)
-    , (result) -> cb(not Boolean(result))
-
-  _sanetizeRoutes: (routes, ignore, cb) ->
-    async.filter routes, (route, c) =>
-      @_isValidRoute route, ignore, c
-    , cb
-
-  _determinateExtensions: (extensions) ->
-    return unless extensions?
-    newExtensions = {}
-    for extension in extensions
-      if @_DEFAULT_OPTS.EXT[extension]?
-        newExtensions[extension] = @_DEFAULT_OPTS.EXT[extension]
-    @_DEFAULT_OPTS.EXT = newExtensions
-
-## -- Exports -------------------------------------------------------------
-
-exports = module.exports = Purifier
+      args.cb(counter, files)
