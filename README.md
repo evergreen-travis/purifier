@@ -26,6 +26,11 @@ Only run `purifier` command in the folder where you want to change the files. Al
 npm install -g purifier
 ```
 
+## TODO:
+
+- [ ] Change how works backlist and use regex (see [dotfiles-regex](https://github.com/regexps/dotfile-regex))
+- [ ] Add more converters, like CSS -> Stylus, SASS -> LESS, etc.
+
 ## License
 
 MIT © [Kiko Beats](http://www.kikobeats.com)
